@@ -1,7 +1,10 @@
 import {Link} from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { useFormik } from "formik";
+import { useState } from "react";
 export default function Loginpage(){
+
+    let [logfail, setLogfail]=useState("");
     let history = useHistory();
     let formik = useFormik({
     initialValues: {
@@ -13,32 +16,37 @@ export default function Loginpage(){
      if (!values.email) {
         errors.email = "Required";
       }
-      else if(!(values.email.includes(".") && values.email.includes("@"))){
+      else if(!((values.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))&&(values.email.includes(".")))){
         errors.email = 'Invalid email address';
       }
       if (!values.password) {
         errors.password = "Required";
       }
+      else if(!(values.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,15}$/))){
+        errors.password = "Password must be atleast 8 characters, 1 Uppercase, 1 Lowercase, 1 Number, max 15 characters";
+      }
       
       return errors;
     },
     onSubmit: async (values) => {
-      console.log("Final Values", values);
-    //   let email = values.email;
-    //   let password = values.password;
-      await fetch("", {
-        // method: "POST",
-        // body: JSON.stringify({
-        //   firstname,
-        //   lastname,
-        //   email,
-        //   password,
-        // }),
-        // headers: {
-        //   "Content-type": "application/json",
-        // },
+      //console.log("Final Values", values);
+      let email = values.email;
+      let password = values.password;
+      let check = await fetch("https://nodetask2-backend.herokuapp.com/login", {
+        method: "POST",
+        body: JSON.stringify({
+          email,
+          password
+        }),
+        headers: {
+          "Content-type": "application/json",
+        },
       });
+      if(check.status===200)
      history.push("/dashboard");
+     else{
+        setLogfail("Wrong Email or Password!");
+     }
     },
   });
     return <>
@@ -50,21 +58,25 @@ export default function Loginpage(){
                         <form onSubmit={formik.handleSubmit}>
                             <h3 className="text-center text-info pt-5">Login</h3>
                             <div className="form-group">
-                                <label for="email" className="text-info">Email:</label><br/>
+                                <label htmlFor="email" className="text-info">Email:</label><br/>
                                 <input type="text" name="email" id="email" className="form-control" onBlur={formik.handleBlur} onChange={formik.handleChange} value={formik.values.email}/>
                             </div>
                             {formik.errors.email && formik.touched.email ? (
                             <div> {formik.errors.email}</div>
                             ) : null}
                             <div className="form-group">
-                                <label for="password" className="text-info">Password:</label><br/>
-                                <input type="text" name="password" id="password" className="form-control" onBlur={formik.handleBlur} onChange={formik.handleChange} value={formik.values.password}/>
+                                <label htmlFor="password" className="text-info">Password:</label><br/>
+                                <input type="password" name="password" id="password" className="form-control" onBlur={formik.handleBlur} onChange={formik.handleChange} value={formik.values.password}/>
                             </div>
                             {formik.errors.password && formik.touched.password ? (
                             <div> {formik.errors.password}</div>
                             ) : null}
                             <div className="form-group">
-                                <Link to="/forgot" className="text-muted">Forgot Password</Link><br/> <br/>
+                                <Link to="/forgot" className="text-muted">Forgot Password</Link> &nbsp; &nbsp; &nbsp; &nbsp;
+                                <Link to="/signup" className="text-muted">New User?</Link><br/> <br/>
+                                {
+                                    logfail !=="" ? (<div> {logfail} </div> ) : null
+                                }
                                 <input type="submit" name="submit" className="btn btn-info btn-md" value="Login"/>
                             </div>
                         </form>

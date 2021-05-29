@@ -1,12 +1,14 @@
+import {Link} from "react-router-dom";
 import { useHistory } from "react-router-dom";
 import { useFormik } from "formik";
 import { useState } from "react";
-export default function Forgot(){
-  let [logfail, setLogfail]=useState("");
+export default function Loginpage(){
+    let [logfail, setLogfail]=useState("");
     let history = useHistory();
     let formik = useFormik({
     initialValues: {
       email: "",
+      password: "",
     },
     validate: (values) => {
       let errors = {};
@@ -16,42 +18,47 @@ export default function Forgot(){
       else if(!((values.email.match(/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/))&&(values.email.includes(".")))){
         errors.email = 'Invalid email address';
       }
+      if (!values.password) {
+        errors.password = "Required";
+      }
+      else if(!(values.password.match(/^(?=.*[a-z])(?=.*[A-Z])(?=.*[0-9]).{8,15}$/))){
+        errors.password = "Password must be atleast 8 characters, 1 Uppercase, 1 Lowercase, 1 Number, max 15 characters";
+      }
+      
       return errors;
     },
     onSubmit: async (values) => {
       //console.log("Final Values", values);
       let email = values.email;
-      let check = await fetch("https://nodetask2-backend.herokuapp.com/forgot", {
+      let password = values.password;
+      let check=await fetch("https://nodetask2-backend.herokuapp.com/signup", {
         method: "POST",
         body: JSON.stringify({
-          email
+          email,
+          password,
         }),
         headers: {
           "Content-type": "application/json",
         },
       });
       if(check.status===200){
-        alert("Password Reset link sent to your email!");
+        alert("Sign Up successful! Please login to continue!");
         history.push("/");
       }
-      else if(check.status===404){
-        setLogfail("Email does not exist! Please check your email");
-      }
-      else{
-        setLogfail("Something went wrong!");
-      }
-
      
+     else{
+        setLogfail("Oops Something Went wrong!");
+     }
     },
   });
     return <>
-        <div>
+        <div id="signup">
         <div className="container">
             <div id="login-row" className="row justify-content-center align-items-center">
                 <div id="login-column" className="col-md-6">
                     <div id="login-box" className="col-md-12">
                         <form onSubmit={formik.handleSubmit}>
-                            <h3 className="text-center text-info pt-5">Forgot Password</h3>
+                            <h3 className="text-center text-info pt-5">Sign Up</h3>
                             <div className="form-group">
                                 <label htmlFor="email" className="text-info">Email:</label><br/>
                                 <input type="text" name="email" id="email" className="form-control" onBlur={formik.handleBlur} onChange={formik.handleChange} value={formik.values.email}/>
@@ -59,13 +66,19 @@ export default function Forgot(){
                             {formik.errors.email && formik.touched.email ? (
                             <div> {formik.errors.email}</div>
                             ) : null}
-                           
-                           {
+                            <div className="form-group">
+                                <label htmlFor="password" className="text-info">Password:</label><br/>
+                                <input type="password" name="password" id="password" className="form-control" onBlur={formik.handleBlur} onChange={formik.handleChange} value={formik.values.password}/>
+                            </div>
+                            {formik.errors.password && formik.touched.password ? (
+                            <div> {formik.errors.password}</div>
+                            ) : null}
+                            <div className="form-group">
+                                <Link to="/" className="text-muted">Already a user?</Link><br/> <br/>
+                                {
                                     logfail !=="" ? (<div> {logfail} </div> ) : null
                                 }
-                            <div className="form-group">
-                    
-                                <input type="submit" name="submit" className="btn btn-info btn-md" value="Submit"/>
+                                <input type="submit" name="submit" className="btn btn-info btn-md" value="Sign Up"/>
                             </div>
                         </form>
                     </div>
