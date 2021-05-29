@@ -41,15 +41,19 @@ export default function Reset(props){
       }
     },
   });
-    useEffect(async ()=>{
+    useEffect(()=>{
         // call the api
-        let check = await fetch(`https://nodetask2-backend.herokuapp.com/resetpwdcheck/${props.match.params.token}`);
+        async function fetchdata(){
+            let check = await fetch(`https://nodetask2-backend.herokuapp.com/resetpwdcheck/${props.match.params.token}`);
         if(check.status===200)
         setForm(check.status);
         else{
             setForm(404);
         }
-    },[]);
+        }
+        fetchdata();
+        
+    });
     return <>
     {
         form ===-1 ? <h1> Page Loading .....</h1> :
