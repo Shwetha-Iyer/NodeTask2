@@ -41,9 +41,7 @@ export default function Reset(props){
       }
     },
   });
-    useEffect(()=>{
-        // call the api
-        async function fetchdata(){
+    async function fetchdata(){
             let check = await fetch(`https://nodetask2-backend.herokuapp.com/resetpwdcheck/${props.match.params.token}`);
         if(check.status===200)
         setForm(check.status);
@@ -51,6 +49,9 @@ export default function Reset(props){
             setForm(404);
         }
         }
+    useEffect(()=>{
+        // call the api
+        
         fetchdata();
         
     });
