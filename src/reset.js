@@ -51,7 +51,7 @@ export default function Reset(props){
         }
     useEffect(()=>{
         // call the api
-        
+        console.log("inside useeffect");
         fetchdata();
         
     });
