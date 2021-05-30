@@ -41,20 +41,19 @@ export default function Reset(props){
       }
     },
   });
-    async function fetchdata(){
-            let check = await fetch(`https://nodetask2-backend.herokuapp.com/resetpwdcheck/${props.match.params.token}`);
-        if(check.status===200)
-        setForm(check.status);
-        else{
-            setForm(404);
-        }
-        }
     useEffect(()=>{
         // call the api
-        console.log("inside useeffect");
-        fetchdata();
-        
-    });
+        console.log("inside use effect");
+        async function fetchdata(token){
+          let check = await fetch(`https://nodetask2-backend.herokuapp.com/resetpwdcheck/${token}`);
+      if(check.status===200)
+      setForm(check.status);
+      else{
+          setForm(404);
+      }
+      }
+        fetchdata(props.match.params.token);    
+    },[props.match.params.token]);
     return <>
     {
         form ===-1 ? <h1> Page Loading .....</h1> :
